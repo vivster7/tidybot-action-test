@@ -1,0 +1,42 @@
+name: Test Tidybot Action
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test-report-mode:
+    name: Test Report-Only Mode
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Tidybot (Report Mode)
+        uses: vivster7/tidybot-action@main
+        id: tidybot-report
+        with:
+          create-issues: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Show results
+        run: |
+          echo "Findings: ${{ steps.tidybot-report.outputs.findings-count }}"
+          echo "Mode: ${{ steps.tidybot-report.outputs.mode }}"
+          echo "Report: ${{ steps.tidybot-report.outputs.report-url }}"
+
+  test-dry-run:
+    name: Test Dry Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Tidybot (Dry Run)
+        uses: vivster7/tidybot-action@main
+        with:
+          dry-run: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
